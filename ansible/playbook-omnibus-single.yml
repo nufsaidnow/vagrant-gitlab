@@ -33,12 +33,12 @@
   
   - name: Copy cert
     ansible.builtin.copy:
-      src: /vagrant/ca/intermediate/certs/gitlab.local.crt
+      src: /vagrant/certs/public/gitlab.local.crt
       dest: /etc/gitlab/ssl/gitlab.local.crt
   
   - name: Copy key
     ansible.builtin.copy:
-      src: /vagrant/ca/intermediate/private/gitlab.local.key.pem
+      src: /vagrant/certs/private/gitlab.local.key
       dest: /etc/gitlab/ssl/gitlab.local.key
   
   - name: Install GitLab
