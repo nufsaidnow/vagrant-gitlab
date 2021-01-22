@@ -1,0 +1,47 @@
+---
+- hosts: all
+  become: yes
+  tasks: 
+  - name: apt update
+    apt:
+      update_cache: yes
+
+  - name: Install dependencies
+    apt:
+      pkg:
+      - curl
+      - openssh-server
+      - ca-certificates
+      - tzdata
+      - perl
+
+  - name: Install postfix
+    apt:
+      name: postfix
+
+  - name: download gitlab script
+    get_url:
+      url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh
+      dest: "/tmp/script.deb.sh"
+      mode: 0755
+
+  - name: Install GitLab apt repo
+    ansible.builtin.shell: "/tmp/script.deb.sh"
+
+  - name: Ensures /etc/gitlab/ssl exists
+    file: path=/etc/gitlab/ssl state=directory
+  
+  - name: Copy cert
+    ansible.builtin.copy:
+      src: /vagrant/ca/intermediate/certs/gitlab.local.crt
+      dest: /etc/gitlab/ssl/gitlab.local.crt
+  
+  - name: Copy key
+    ansible.builtin.copy:
+      src: /vagrant/ca/intermediate/private/gitlab.local.key.pem
+      dest: /etc/gitlab/ssl/gitlab.local.key
+  
+  - name: Install GitLab
+    apt: name=gitlab-ee state=present
+    environment:
+      EXTERNAL_URL: "https://gitlab.local:8443"
